@@ -1,0 +1,50 @@
+
+import streamlit as st
+
+def show_home(topic):
+    st.title(f"Learning Materials for {topic}")
+    st.write("Welcome to the generated UI! Use the sidebar to navigate.")
+
+def show_syllabus(topic):
+    st.title(f"Syllabus for {topic}")
+    st.write("1. Introduction to " + topic)
+    st.write("2. Key Concepts in " + topic)
+    st.write("3. Advanced Topics in " + topic)
+
+def show_articles(topic):
+    st.title(f"Learning Articles for {topic}")
+    st.write("- https://example.com/" + topic + "-basics")
+    st.write("- https://example.com/" + topic + "-advanced")
+    st.write("- https://example.com/" + topic + "-case-studies")
+
+def show_quiz(topic):
+    st.title(f"Quiz on {topic}")
+    st.write("1. What is " + topic + "?")
+    st.write("2. Name one application of " + topic + ".")
+    st.write("3. Describe a challenge related to " + topic + ".")
+
+def show_back():
+    st.title("Return to Generator")
+    st.write("Click the button below to go back to the generator.")
+    if st.button("Go Back"):
+        st.experimental_set_query_params(page="generator")
+
+def main():
+    topic = "Example Topic"
+    st.sidebar.title("Navigation")
+    selection = st.sidebar.radio("Go to", 
+        ["Back to Generator", "Home", "Syllabus", "Articles", "Quiz"])
+    
+    if selection == "Back to Generator":
+        show_back()
+    elif selection == "Home":
+        show_home(topic)
+    elif selection == "Syllabus":
+        show_syllabus(topic)
+    elif selection == "Articles":
+        show_articles(topic)
+    elif selection == "Quiz":
+        show_quiz(topic)
+
+if __name__ == "__main__":
+    main()

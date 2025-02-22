@@ -14,25 +14,16 @@ def set_page(page, module_number=None, article_index=None):
 
 
 def create_progress_visual(module_path, current_article, quiz_passed):
+    
     # Count all article files (assuming they start with "article_")
     articles = sorted(
         [f for f in os.listdir(module_path) if f.startswith("article_")],
         key=lambda x: int(x.split("_")[1].split(".")[0]),
     )
     total_articles = len(articles)
-    progress_symbols = []
-    for i in range(1, total_articles + 1):
-        if i < current_article:
-            progress_symbols.append("🟢")  # completed article
-        elif i == current_article:
-            progress_symbols.append("🔵")  # current article
-        else:
-            progress_symbols.append("⚪")  # not yet started
-    # Append quiz symbol at the end
-    quiz_symbol = "✅" if quiz_passed else "⚪"
-    progress_symbols.append(quiz_symbol)
-    # Connect the symbols with lines
-    return " — ".join(progress_symbols)
+    progress_percentage = ((current_article - 1 + (1 if quiz_passed else 0)) / (total_articles + 1)) * 100
+    st.progress((progress_percentage/100), text=f"{progress_percentage}% completed")
+    
 
 
 def render_module_overview(module_number):
@@ -61,12 +52,10 @@ def render_module_overview(module_number):
     quiz_passed = progress.get("quiz_passed", False)
 
     # Display visual progress for articles and quiz (bigger and centered)
-    progress_visual = create_progress_visual(module_path, current_article, quiz_passed)
     st.markdown("### Progress")
-    st.markdown(
-        f"<div style='font-size: 32px; text-align: center; margin: 20px 0;'>{progress_visual}</div>",
-        unsafe_allow_html=True,
-    )
+    progress_visual = create_progress_visual(module_path, current_article, quiz_passed)
+    
+ 
 
     # Determine how many articles exist in this module
     articles = [f for f in os.listdir(module_path) if f.startswith("article_")]
@@ -89,3 +78,4 @@ def render_module_overview(module_number):
     with col2:
         if st.button("Restart Module", key=f"restart_{module_number}"):
             set_page("article", module_number=module_number, article_index=1)
+            

@@ -182,7 +182,7 @@ class ModuleGenerator:
         messages=[
             {"role": "system", "content": "You are a helpful tutor who is going to assess if a student understood certain subject material. You will do this by returning Streamlit code that will fit in individual Python files/pages. Focus on returning creative UI components, like tables, interactive graphs, games, or anything else you can think of that will surprise the student that will help the student learn. Only return Streamlit code, nothing else that would not work directly as Streamlit code, no not return any backticks."},
             {"role": "system", "content": f"Here is the module the student tried to learn from as Streamlit code:{previous_module}"},
-            {"role": "system", "content": f"Once a user gets all the answers correct on the quiz, be certain to call a function called exactly this:'utils.quiz_passed(module_number)"},
+            {"role": "system", "content": f"Once a user gets all the answers correct on the quiz, be certain to call a function called exactly this, and do not import utils:'utils.quiz_passed(module_number)"},
 
             {
                 "role": "user",

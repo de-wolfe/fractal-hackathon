@@ -16,11 +16,12 @@ claude_client = anthropic.Anthropic(api_key=claude_key)
 
 def clean_streamlit_code(code):
     """Remove setup config and unnecessary imports from Streamlit code."""
+    # something broken here
     lines = code.splitlines()
     cleaned_lines = []
     for line in lines:
         # Skip markdown fences and st.set_page_config and extraneous imports
-        if line.strip().startswith("```") or "st.set_page_config" in line:
+        if line.strip().startswith("```"):
             continue
         cleaned_lines.append(line)
     return "\n".join(cleaned_lines)
@@ -101,7 +102,7 @@ Return the enhanced code between <code> </code> tags. Include ALL necessary impo
 
     response = claude_client.messages.create(
         model="claude-3-5-sonnet-20241022",
-        max_tokens=2000,
+        max_tokens=5000,
         messages=[{"role": "user", "content": prompt}],
     )
 
@@ -334,5 +335,5 @@ class ModuleGenerator:
         ]
     )
         assessment_content = f"{completion.choices[0].message.content}\n"
-        print(assessment_content)
+        assessment_content = clean_streamlit_code(assessment_content)
         return assessment_content

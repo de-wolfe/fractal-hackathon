@@ -1,5 +1,4 @@
 import streamlit as st
-import writer
 import test_gpt_call
 
 import os
@@ -162,7 +161,7 @@ def main():
         if module_number is None:
             st.error("No module specified.")
         else:
-            render_article_module(module_number)
+            render_article_module(module_number, article_index)
 
     elif current_page == "quiz":
         if module_number is None:

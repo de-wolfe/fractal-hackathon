@@ -1,0 +1,19 @@
+{
+  "module_number": 1,
+  "module_name": "Module 1: Introduction to linear algebra",
+  "overview": "Welcome to the Linear Algebra module designed with a visual learning approach! This course will guide you through the foundational concepts of linear algebra using engaging visual aids, diagrams, and interactive applications to help you grasp the material intuitively.\n\nWe begin with vectors, where you'll explore their properties and operations through visual representations in both 2D and 3D spaces. Watch animations that dynamically demonstrate vector addition, scalar multiplication, and dot products.\n\nMoving to matrices, you\u2019ll experience step-by-step visual breakdowns of matrix operations like addition, multiplication, and transposition. Matrix transformations will be brought to life, illustrating how they affect vector spaces through creative animations.\n\nAs we delve into systems of linear equations, you will interpret these concepts using graphing software that visually solves systems and elucidates solutions' geometric significance. Eigenvalues and eigenvectors will be demystified using interactive models showing how they stretch and rotate spaces.\n\nFinally, throughout the course, you'll encounter visual proofs and real-world applications presented through infographics and simulations that connect theory with practice in engineering, computer science, and more.\n\nPrepare to engage your visual senses and deepen your understanding of linear algebra like never before!",
+  "learning_objectives": [
+    "Understand the fundamentals of linear algebra",
+    "Explore advanced concepts in linear algebra",
+    "Apply practical examples related to linear algebra"
+  ],
+  "articles": {
+    "1": "Visualizing Vectors: A Graphical Approach to Understanding Linear Algebra",
+    "2": "Matrix Mastery: Using Visual Tools to Simplify Complex Concepts in Linear Algebra",
+    "3": "Geometric Interpretations: Exploring Linear Transformations through Visual Aid"
+  },
+  "progress": {
+    "current_article": 2,
+    "quiz_passed": false
+  }
+}

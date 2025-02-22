@@ -11,8 +11,6 @@ from quiz_module import render_quiz_module
 from article_module import render_article_module
 
 
-
-
 # Helper functions for query param routing
 def set_page(page, module_number=None, article_index=None):
     params = {"page": page}
@@ -114,6 +112,7 @@ class ContentApp:
         generator.create_module_structure()
         generator.generate_content(topic, learning_style)
 
+
 def main():
     st.set_page_config(page_title="Educational Content Generator")
     app = ContentApp()
@@ -162,7 +161,7 @@ def main():
         if module_number is None:
             st.error("No module specified.")
         else:
-            render_article_module(module_number)
+            render_article_module(module_number, article_index)
 
     elif current_page == "quiz":
         if module_number is None:
@@ -172,6 +171,7 @@ def main():
 
     else:
         st.error("Page not found!")
+
 
 if __name__ == "__main__":
     main()

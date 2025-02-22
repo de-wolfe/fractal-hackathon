@@ -1,5 +1,27 @@
-
 import streamlit as st
 
-st.header("Quiz on Algebra")
-st.write("**Question:**\n\nSolve the equation for \\( x \\): \\( 3x - 7 = 2x + 5 \\).\n\nA) \\( x = 5 \\)  \nB) \\( x = 12 \\)  \nC) \\( x = -12 \\)  \nD) \\( x = -5 \\)  \n\n*Correct Answer:* A) \\( x = 5 \\)  # Correct option")
+st.title("Spanish Greetings Quiz")
+
+st.header("Test Your Knowledge")
+
+st.write("Translate the following English phrases into Spanish:")
+
+# First question
+st.subheader("1) Hello")
+
+answer1 = st.text_input("Your answer for 'Hello':")
+
+if answer1.lower() == "hola":
+    st.success("Correct! 'Hello' in Spanish is 'Hola'.")
+elif answer1:
+    st.error("Incorrect. Try again.")
+
+# Second question
+st.subheader("2) How are you?")
+
+answer2 = st.text_input("Your answer for 'How are you?':")
+
+if answer2.lower() == "¿cómo estás?" or answer2.lower() == "como estas":
+    st.success("Correct! 'How are you?' in Spanish is '¿Cómo estás?'.")
+elif answer2:
+    st.error("Incorrect. Try again.")

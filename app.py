@@ -1,24 +1,13 @@
 import streamlit as st
 import writer
 import test_gpt_call
-import random
-import numpy as np
-import matplotlib.pyplot as plt
 
-    
-
-# Streamlit UI setup
-st.title("Interactive Quiz App")
-subject = st.text_input("What do you want to learn about?")
-crazy_level = st.slider("Crazy Level")
-if st.button("Click me"):
-    test_gpt_call.ask_openai_teaching(subject, crazy_level)
-
-import streamlit as st
 import os
 import json
 from pathlib import Path
 from module_generator import ModuleGenerator
+
+
 
 
 # Helper functions for query param routing
@@ -99,9 +88,7 @@ class ContentApp:
         new_module_number = modules[-1][0] + 1 if modules else 1
         generator = ModuleGenerator(topic, new_module_number)
         generator.create_module_structure()
-        generator.generate_content()
-
-st.title("Introduction to Basic Thermodynamics")
+        generator.generate_content(topic)
 
 def main():
     st.set_page_config(page_title="Educational Content Generator")
@@ -115,9 +102,11 @@ def main():
     if current_page == "home":
         st.title("Educational Content Generator")
         st.write("Create a new module or select one from the list below.")
-
+        # Streamlit UI setup
+        topic = st.text_input("What do you want to learn about?")
+        learning_style = st.text_input("How do you best learn?")
+        crazy_level = st.slider("Crazy Level")
         # Input for a new module
-        topic = st.text_input("Enter a topic for a new module:")
         if st.button("Generate New Module"):
             if topic.strip():
                 app.generate_new_module(topic.strip())

@@ -82,13 +82,13 @@ class ContentApp:
         modules.sort(key=lambda x: x[0])
         return modules
 
-    def generate_new_module(self, topic):
+    def generate_new_module(self, topic, learning_style):
         """Generate a new module by incrementing from the last module number."""
         modules = self.get_all_modules()
         new_module_number = modules[-1][0] + 1 if modules else 1
         generator = ModuleGenerator(topic, new_module_number)
         generator.create_module_structure()
-        generator.generate_content(topic)
+        generator.generate_content(topic, learning_style)
 
 def main():
     st.set_page_config(page_title="Educational Content Generator")
@@ -109,7 +109,7 @@ def main():
         # Input for a new module
         if st.button("Generate New Module"):
             if topic.strip():
-                app.generate_new_module(topic.strip())
+                app.generate_new_module(topic.strip(), learning_style)
                 st.success(f"Module on '{topic}' created!")
                 st.rerun()
             else:

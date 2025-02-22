@@ -25,7 +25,7 @@ class ModuleGenerator:
         Path(f"{self.module_path}/article_1.py").touch()
         Path(f"{self.module_path}/quiz.py").touch()
 
-    def generate_content(self, subject):
+    def generate_content(self, subject, learning_style):
         """Generate content for all module files using OpenAI."""
         # Generate and save module metadata (including progress tracking)
         module_data = self.generate_module_metadata()
@@ -33,12 +33,12 @@ class ModuleGenerator:
             f.write(json.dumps(module_data, indent=2))
 
         # Generate and save article content
-        article_content = self.generate_teaching(subject)
+        article_content = self.generate_teaching(subject, learning_style)
         with open(f"{self.module_path}/article_1.py", "w") as f:
             f.write(article_content)
 
         # Generate and save quiz content
-        quiz_content = self.generate_assessment(subject, article_content)
+        quiz_content = self.generate_assessment(subject, learning_style, article_content)
         with open(f"{self.module_path}/quiz.py", "w") as f:
             f.write(quiz_content)
 
@@ -56,12 +56,14 @@ class ModuleGenerator:
             "progress": {"current_article": 1, "quiz_passed": False},
         }
 
-    def generate_teaching(self, subject):
+    def generate_teaching(self, subject, learning_style):
         """Generate an article about the topic using OpenAI chat completions."""
         completion = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful tutor who is going to teach someone a subject they request in an engaging, concise way. You will do this by returning Streamlit code that will fit in individual Python files/pages. Only return Streamlit code, nothing else that would not work directly as Streamlit code, no not return any backticks. "},
+            {"role": "system", "content": f"Here is some information on the learning style of this particular student, or things that make it easier for them to learn:{learning_style}. When making Streamlit components, prioritize making content in this style."},
+
             {
                 "role": "user",
                 "content": f"Start teaching them by generating a short article, quiz, or some crazy component to teach them  about {subject}. The amount of information contained should be no more than a paragraph or 2. Return the article Streamlit code that can render it."
@@ -72,7 +74,7 @@ class ModuleGenerator:
         print(teaching_content)
         return teaching_content
 
-    def generate_assessment(self, subject, previous_module):
+    def generate_assessment(self, subject, learning_style, previous_module):
         """Generate a multiple-choice quiz question about the topic using OpenAI chat completions."""
         completion = client.chat.completions.create(
         model="gpt-4o",

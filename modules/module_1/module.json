@@ -1,0 +1,19 @@
+{
+  "module_number": 1,
+  "module_name": "Module 1: Introduction to nuclear energy",
+  "overview": "Nuclear Energy Module Overview\n\n\ud83c\udfaf Learning through Visual Elements:\n\n\u269b\ufe0f We'll explore the atom's structure using detailed diagrams and 3D models, showing how nuclear reactions occur at the core level.\n\n\u26a1 Colorful flowcharts will illustrate the step-by-step process of nuclear fission and how it generates electricity in power plants.\n\n\ud83c\udfed Virtual tours and cutaway diagrams of nuclear power plants will help you understand their key components: reactor core, cooling towers, and turbines.\n\n\ud83d\udcca Interactive infographics will compare nuclear energy with other power sources, showing environmental impact and energy output.\n\n\ud83d\udd2c We'll use animated simulations to demonstrate radiation safety protocols and containment methods.\n\nThis visual journey through nuclear energy will transform complex concepts into clear, memorable images that stick with you long after the module ends.\n\nWatch, observe, and discover the power of the atom! \n\nDuration: 4 weeks\nKey visual tools: Diagrams, animations, virtual tours, infographics, and 3D models",
+  "learning_objectives": [
+    "Understand the fundamentals of nuclear energy",
+    "Explore advanced concepts in nuclear energy",
+    "Apply practical examples related to nuclear energy"
+  ],
+  "articles": {
+    "1": "\"Nuclear Reactions in Motion: A Visual Journey Through Fission and Fusion\"",
+    "2": "\"Inside the Reactor: Color-Coded Guide to Nuclear Power Plant Components\"",
+    "3": "\"The Rainbow of Radiation: Visualizing Nuclear Energy Wavelengths\""
+  },
+  "progress": {
+    "current_article": 2,
+    "quiz_passed": false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "module_number": 3,
+  "module_name": "Module 3: Introduction to Unit testing",
+  "overview": "Module Overview: Unit Testing - Because Even Code Needs a Reality Check! \ud83c\udfaf\n\nEver heard the one about the programmer who didn't test their code? Neither have I, they're still debugging it! \n\nIn this module, we'll dive into the world of unit testing, where we'll learn to catch bugs before they catch us. Think of it as being a code detective, but instead of a magnifying glass, you've got assertions and test cases.\n\nWe'll cover:\n- Why unit testing is like having a responsible friend who actually reads the restaurant reviews before picking a place to eat\n- The AAA pattern (Arrange, Act, Assert) - not to be confused with your code's cry for help\n- Test-driven development (TDD), or as I like to call it, \"writing the spoilers before the movie\"\n- Mocking: Because sometimes you need a stunt double for your objects\n\nRemember: The only thing worse than finding bugs in your code is having your users find them first. As we say in the testing world, \"It's not a bug, it's an unwritten test case!\"\n\nBy the end of this module, you'll be writing tests so good, your code will thank you. And if it doesn't, well, that's probably a bug you should test for! \ud83d\ude09\n\nLet's get testing - because nobody wants their code to be the next \"it works on my machine\" meme!",
+  "learning_objectives": [
+    "Understand the fundamentals of Unit testing",
+    "Explore advanced concepts in Unit testing",
+    "Apply practical examples related to Unit testing"
+  ],
+  "articles": {
+    "1": "\"Why Did the Unit Test Cross the Road? To Assert Its Independence!\"",
+    "2": "\"Mocking Around: A Comedy of Test Doubles and Jest-ers\"",
+    "3": "\"Debug Walks into a Bar: The Hilarious Side of Test-Driven Development\""
+  },
+  "progress": {
+    "current_article": 1,
+    "quiz_passed": false
+  }
+}

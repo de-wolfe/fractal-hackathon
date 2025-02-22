@@ -1,7 +1,7 @@
 import os
 import json
 import streamlit as st
-from module_generator import enhance_with_claude
+
 import anthropic
 
 
@@ -151,18 +151,18 @@ def render_article_module(module_number, article_index):
                 set_page("quiz", module_number=module_number)
 
     # --- Turbocharge Section ---
-    st.markdown("---")
-
-    if st.button("Turbocharge Article"):
-        purpose = "Improve visual design, rewrite the code to fix any issues, and make the article more engaging. (Turbocharge it)"
-        turbocharged_content = turbocharge_article(original_content, purpose)
-        print(turbocharged_content)
-
-        try:
-            exec(turbocharged_content, globals())
-            st.success("Article successfully turbocharged!")
-        except Exception as e:
-            st.error(f"Error executing turbocharged code: {e}")
+    # st.markdown("---")
+    #
+    # if st.button("Turbocharge Article"):
+    #     purpose = "Improve visual design, rewrite the code to fix any issues, and make the article more engaging. (Turbocharge it)"
+    #     turbocharged_content = turbocharge_article(original_content, purpose)
+    #     print(turbocharged_content)
+    #
+    #     try:
+    #         exec(turbocharged_content, globals())
+    #         st.success("Article successfully turbocharged!")
+    #     except Exception as e:
+    #         st.error(f"Error executing turbocharged code: {e}")
 
 
 claude_key = st.secrets["CLAUDE_KEY"]
@@ -171,53 +171,110 @@ claude_client = anthropic.Anthropic(api_key=claude_key)
 
 def turbocharge_article(original_content, purpose):
     """
-    Completely rewrites the given article code using Claude to fix syntax errors,
-    improve readability, and add interactivity.
+    Turbocharge the given article code using a two-stage process:
 
-    The new code will include all necessary imports at the top and only use packages
-    from the approved list: streamlit, altair, bokeh, matplotlib, plotly, pydeck,
-    seaborn, pandas, numpy, pillow, rich, py3Dmol, stmol, webcolors.
+    1. Extraction Stage:
+       - Analyze the original code and break it into key sections (e.g., imports,
+         helper functions, main logic, navigation, etc.).
+       - Return the breakdown as a JSON object.
+
+    2. Rewrite Stage:
+       - Use the extracted sections to rewrite the entire code into a crazy complex,
+         interactive, and visually engaging Streamlit application.
+       - Ensure that all necessary imports are included at the top and that only the
+         approved packages are used.
 
     Parameters:
         original_content (str): The original article code.
-        purpose (str): The goal for rewriting the code.
+        purpose (str): The goal for turbocharging the code.
 
     Returns:
-        str: The completely rewritten Streamlit code.
+        str: The completely rewritten and turbocharged Streamlit code.
     """
-    prompt = f"""As an expert in Streamlit development, completely rewrite the following article code from scratch. 
-Your task is to fix any syntax errors, improve readability, and add interactivity.
-Make sure the code includes all necessary imports at the top.
-Only use packages from our approved list: streamlit, altair, bokeh, matplotlib, plotly, pydeck, seaborn, pandas, numpy, pillow, rich, py3Dmol, stmol, webcolors.
+    # Stage 1: Extract Sections from the Original Code
+    extraction_prompt = f"""As an expert in Streamlit development, please analyze the following article code and break it down into its key sections. 
+Divide the code into sections such as:
+- Imports
+- Helper functions
+- Main rendering logic
+- Navigation controls
+- Turbocharge section
+- Any other significant sections.
 
+Return the result as a JSON object with keys representing each section (e.g. "imports", "helper_functions", "main_logic", "navigation", "turbocharge").
 Here is the original code:
 {original_content}
+"""
+    extraction_response = claude_client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=2000,
+        messages=[{"role": "user", "content": extraction_prompt}],
+    )
+    # Extract the text from the response
+    if hasattr(extraction_response.content, "text"):
+        extraction_text = extraction_response.content.text
+    elif (
+        isinstance(extraction_response.content, list)
+        and len(extraction_response.content) > 0
+    ):
+        extraction_text = extraction_response.content[0].text
+    else:
+        extraction_text = str(extraction_response.content)
+
+    # Attempt to parse the JSON from the extraction
+    try:
+        import json
+
+        sections_json = json.loads(extraction_text)
+    except Exception as e:
+        # If parsing fails, fall back to a simple key
+        sections_json = {"extracted_sections": extraction_text}
+
+    # Stage 2: Rewrite the Code Using the Extracted Sections
+    rewrite_prompt = f"""Using the following JSON object that contains sections of a Streamlit article code, rewrite and turbocharge the entire code to be more complex, interactive, and visually engaging.
+Combine the sections appropriately, fix any syntax errors, and include all necessary imports at the top.
+Only use packages from our approved list: streamlit, altair, bokeh, matplotlib, plotly, pydeck, seaborn, pandas, numpy, pillow, rich, py3Dmol, stmol, webcolors.
+
+DO NOT INCLUDE THIS: st.set_page_config()
+1. Fix any potential issues or bugs.
+2. Make the display more visually appealing and interactive.
+3. Remove any st.set_page_config calls.
+4. Keep the core teaching content but make it more engaging.
+5. Ensure that all necessary imports are included at the top of the code. In particular, if the code uses functions or modules like colorsys or numpy (as np), include "import colorsys" or "import numpy as np" respectively.
+6. Only use packages from our approved package list: streamlit, altair, bokeh, matplotlib, plotly, pydeck, seaborn, pandas, numpy, pillow, rich, py3Dmol, stmol, webcolors.
+7. Maintain any essential existing imports.
+
+include your thoughts in a <thinking> tag 
+
+Return the completely rewritten code between <code> and </code> tags.
+
+Sections JSON:
+{json.dumps(sections_json, indent=2)}
 
 Purpose: {purpose}
-
-Return the completely rewritten code between <code> and </code> tags."""
-
-    response = claude_client.messages.create(
+"""
+    rewrite_response = claude_client.messages.create(
         model="claude-3-5-sonnet-20241022",
         max_tokens=5000,
-        messages=[{"role": "user", "content": prompt}],
+        messages=[{"role": "user", "content": rewrite_prompt}],
     )
-
-    # Extract the text content from Claude's response
-    if hasattr(response.content, "text"):
-        response_text = response.content.text
-    elif isinstance(response.content, list) and len(response.content) > 0:
-        response_text = response.content[0].text
+    # Extract text from the rewrite response
+    if hasattr(rewrite_response.content, "text"):
+        rewrite_text = rewrite_response.content.text
+    elif (
+        isinstance(rewrite_response.content, list) and len(rewrite_response.content) > 0
+    ):
+        rewrite_text = rewrite_response.content[0].text
     else:
-        response_text = str(response.content)
+        rewrite_text = str(rewrite_response.content)
 
-    # Extract code from between <code> and </code> tags
+    # Extract the code between <code> and </code> tags
     import re
 
-    code_match = re.search(r"<code>(.*?)</code>", response_text, re.DOTALL)
+    code_match = re.search(r"<code>(.*?)</code>", rewrite_text, re.DOTALL)
     if code_match:
-        rewritten_content = code_match.group(1).strip()
+        turbocharged_content = code_match.group(1).strip()
     else:
-        rewritten_content = response_text.strip()
+        turbocharged_content = rewrite_text.strip()
 
-    return rewritten_content
+    return turbocharged_content

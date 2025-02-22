@@ -16,6 +16,8 @@ claude_client = anthropic.Anthropic(api_key=claude_key)
 
 def clean_streamlit_code(code):
     """Remove setup config and unnecessary imports from Streamlit code."""
+    # something broken here
+    return code
     lines = code.splitlines()
     cleaned_lines = []
     for line in lines:

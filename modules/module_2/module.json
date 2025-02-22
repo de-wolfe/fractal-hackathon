@@ -1,0 +1,19 @@
+{
+  "module_number": 2,
+  "module_name": "Module 2: Introduction to Quantum Mechanics",
+  "overview": "Module Overview: Quantum Mechanics Through Riddles\n\nWelcome to the mysterious world of Quantum Mechanics, where we'll unravel the universe's greatest puzzles through mind-bending riddles! In this unique module, we'll explore fundamental quantum concepts by solving paradoxical problems that challenge our everyday understanding of reality.\n\nEach lesson presents a quantum principle as a riddle, encouraging you to think beyond classical physics. For example:\n\"I am both here and there, until you look for me. What am I?\" (introducing superposition)\n\"The more precisely you know where I am, the less you know about my speed. What am I?\" (exploring Heisenberg's uncertainty principle)\n\nThrough these brain-teasers, you'll gradually grasp wave-particle duality, quantum entanglement, and the probabilistic nature of the quantum world. The module concludes with Schr\u00f6dinger's famous cat paradox, presented as the ultimate quantum riddle.\n\nThis approach transforms complex quantum concepts into engaging puzzles, making abstract ideas more accessible and memorable. Get ready to challenge your intuition and discover why even Einstein said quantum mechanics made him feel like he was \"walking through dreams.\"\n\nLearning Outcomes:\n- Understand key quantum principles through puzzle-solving\n- Develop quantum intuition through paradoxical thinking\n- Apply creative problem-solving to complex physics concepts\n- Master the art of thinking \"quantumly\"\n\nAre you ready to solve the universe's greatest riddles?",
+  "learning_objectives": [
+    "Understand the fundamentals of Quantum Mechanics",
+    "Explore advanced concepts in Quantum Mechanics",
+    "Apply practical examples related to Quantum Mechanics"
+  ],
+  "articles": {
+    "1": "Schr\u00f6dinger's Riddle: When is a Cat Both Dead and Alive?",
+    "2": "The Quantum Puzzle: Why Does Light Play Hide and Seek?",
+    "3": "Entanglement's Enigma: How Do Particles Dance Together Miles Apart?"
+  },
+  "progress": {
+    "current_article": 4,
+    "quiz_passed": false
+  }
+}

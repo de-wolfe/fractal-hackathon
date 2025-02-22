@@ -33,8 +33,11 @@ def enhance_with_claude(content, purpose):
 2. Make the display more visually appealing and interactive.
 3. Remove any st.set_page_config calls.
 4. Keep the core teaching content but make it more engaging.
-5. Ensure that all necessary imports are included at the top of the code. In particular, if the code uses functions or modules like colorsys or numpy (as np), include "import colorsys" or "import numpy as np" respectively. Only use packages from our approved package list.
-6. Maintain any essential existing imports.
+5. Ensure that all necessary imports are included at the top of the code. In particular, if the code uses functions or modules like colorsys or numpy (as np), include "import colorsys" or "import numpy as np" respectively.
+6. Only use packages from our approved package list: streamlit, altair, bokeh, matplotlib, plotly, pydeck, seaborn, pandas, numpy, pillow, rich, py3Dmol, stmol, webcolors.
+7. Maintain any essential existing imports.
+
+Very important: Make sure to include ALL the code for the file, not just the changed part
 
 Here's the code to enhance:
 {content}
@@ -45,7 +48,7 @@ Return the enhanced code between <code> </code> tags. Include ALL necessary impo
 
     response = claude_client.messages.create(
         model="claude-3-5-sonnet-20241022",
-        max_tokens=2000,
+        max_tokens=5000,
         messages=[{"role": "user", "content": prompt}],
     )
 

@@ -1,21 +1,5 @@
 
 import streamlit as st
 
-def display_quiz():
-    st.header("Module Quiz")
-    score = 0
-    total_questions = 3
-
-    # Question 1
-    q1 = st.radio(
-        "Question 1: Sample question here?",
-        ["Option 1", "Option 2", "Option 3", "Option 4"]
-    )
-    if q1 == "Option 2":  # Correct answer
-        score += 1
-
-    # Display results
-    if st.button("Submit Quiz"):
-        st.write(f"Your score: {score}/{total_questions}")
-
-display_quiz()
+st.header("Quiz on Python programming")
+st.write("**Question:**  \nWhat will be the output of the following Python code snippet?\n\n```python\ndef foo(*args, **kwargs):\n    print(\"Args:\", args)\n    print(\"Kwargs:\", kwargs)\n\nfoo(1, 2, 3, a=4, b=5)\n```\n\nA)  \n```\nArgs: (1, 2, 3)\nKwargs: {'a': 4, 'b': 5}\n```\n\nB)  \n```\nArgs: [1, 2, 3]\nKwargs: {'a': 4, 'b': 5}\n```\n\nC)  \n```\nArgs: (1, 2, 3)\nKwargs: 4, 5\n```\n\nD)  \n```\nArgs: [1, 2, 3]\nKwargs: [4, 5]\n```\n\n*Correct Answer: A*")

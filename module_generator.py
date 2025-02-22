@@ -1,7 +1,13 @@
 import os
 import json
 from pathlib import Path
-import openai  # Or your preferred LLM client
+from openai import OpenAI
+import streamlit as st
+
+api_key = st.secrets["OPENAI_KEY"]
+
+# Instantiate the OpenAI client
+client = OpenAI(api_key=api_key)
 
 
 class ModuleGenerator:
@@ -11,17 +17,17 @@ class ModuleGenerator:
         self.module_path = f"modules/module_{module_number}"
 
     def create_module_structure(self):
-        """Create the module directory and empty files"""
+        """Create the module directory and empty files."""
         os.makedirs(self.module_path, exist_ok=True)
 
-        # Create empty files
+        # Create empty files for metadata, article, and quiz
         Path(f"{self.module_path}/module.py").touch()
         Path(f"{self.module_path}/article_1.py").touch()
         Path(f"{self.module_path}/quiz.py").touch()
 
     def generate_content(self):
-        """Generate content for all module files using LLM"""
-        # Generate and save module metadata
+        """Generate content for all module files using OpenAI."""
+        # Generate and save module metadata (including progress tracking)
         module_data = self.generate_module_metadata()
         with open(f"{self.module_path}/module.py", "w") as f:
             f.write(json.dumps(module_data, indent=2))
@@ -37,50 +43,61 @@ class ModuleGenerator:
             f.write(quiz_content)
 
     def generate_module_metadata(self):
-        """Generate module metadata using LLM"""
-        # This would make an LLM call to generate appropriate metadata
+        """Generate module metadata including progress tracking."""
         return {
             "module_number": self.module_number,
-            "module_name": f"Module {self.module_number}",
+            "module_name": f"Module {self.module_number}: Introduction to {self.topic}",
             "learning_objectives": [
-                "Understand key concepts",
-                "Master fundamental principles",
-                "Apply knowledge practically",
+                f"Understand the fundamentals of {self.topic}",
+                f"Explore advanced concepts in {self.topic}",
+                f"Apply practical examples related to {self.topic}",
             ],
+            # Progress tracking for articles and quiz
+            "progress": {"current_article": 1, "quiz_passed": False},
         }
 
     def generate_article(self):
-        """Generate article content using LLM"""
-        # This would make an LLM call to generate the article content
-        return """
+        """Generate an article about the topic using OpenAI chat completions."""
+        prompt = (
+            f"Write an engaging and informative educational article about {self.topic}. "
+            "Explain its key concepts, background, and practical applications in a clear and concise manner."
+        )
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o",
+                store=True,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            article_text = completion.choices[0].message.content.strip()
+        except Exception as e:
+            article_text = f"Error generating article content: {e}"
+
+        return f"""
 import streamlit as st
 
-st.header("Article Title")
-st.write("Article content goes here...")
+st.header("Introduction to {self.topic}")
+st.write({json.dumps(article_text)})
 """
 
     def generate_quiz(self):
-        """Generate quiz content using LLM"""
-        # This would make an LLM call to generate the quiz
-        return """
+        """Generate a multiple-choice quiz question about the topic using OpenAI chat completions."""
+        prompt = (
+            f"Generate a multiple-choice quiz question that tests understanding of {self.topic}. "
+            "Include one question with 4 answer options, and mark the correct option in a comment."
+        )
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o",
+                store=True,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            quiz_text = completion.choices[0].message.content.strip()
+        except Exception as e:
+            quiz_text = f"Error generating quiz content: {e}"
+
+        return f"""
 import streamlit as st
 
-def display_quiz():
-    st.header("Module Quiz")
-    score = 0
-    total_questions = 3
-
-    # Question 1
-    q1 = st.radio(
-        "Question 1: Sample question here?",
-        ["Option 1", "Option 2", "Option 3", "Option 4"]
-    )
-    if q1 == "Option 2":  # Correct answer
-        score += 1
-
-    # Display results
-    if st.button("Submit Quiz"):
-        st.write(f"Your score: {score}/{total_questions}")
-
-display_quiz()
+st.header("Quiz on {self.topic}")
+st.write({json.dumps(quiz_text)})
 """

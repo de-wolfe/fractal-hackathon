@@ -1,21 +1,5 @@
 
 import streamlit as st
 
-def display_quiz():
-    st.header("Module Quiz")
-    score = 0
-    total_questions = 3
-
-    # Question 1
-    q1 = st.radio(
-        "Question 1: Sample question here?",
-        ["Option 1", "Option 2", "Option 3", "Option 4"]
-    )
-    if q1 == "Option 2":  # Correct answer
-        score += 1
-
-    # Display results
-    if st.button("Submit Quiz"):
-        st.write(f"Your score: {score}/{total_questions}")
-
-display_quiz()
+st.header("Quiz on Algebra")
+st.write("**Question:**\n\nSolve the equation for \\( x \\): \\( 3x - 7 = 2x + 5 \\).\n\nA) \\( x = 5 \\)  \nB) \\( x = 12 \\)  \nC) \\( x = -12 \\)  \nD) \\( x = -5 \\)  \n\n*Correct Answer:* A) \\( x = 5 \\)  # Correct option")

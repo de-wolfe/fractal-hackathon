@@ -158,37 +158,53 @@ def main():
         if not os.path.exists(article_file):
             st.error("Article not found!")
             return
+        # Load and execute the article content
         with open(article_file, "r") as f:
             article_content = f.read()
             exec(article_content, globals())
 
+        # Determine the total number of articles for this module
         total_articles = len(
             [f for f in os.listdir(module_path) if f.startswith("article_")]
         )
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Previous Article"):
-                if article_index == 1:
-                    set_page("module", module_number=module_number)
-                else:
+
+        # Create three columns for navigation
+        col_prev, col_center, col_next = st.columns([1, 2, 1])
+
+        # Show "Previous Article" button only if not on the first article
+        if article_index > 1:
+            with col_prev:
+                if st.button("Previous Article"):
                     set_page(
                         "article",
                         module_number=module_number,
                         article_index=article_index - 1,
                     )
-                st.rerun()
-        with col2:
-            if st.button("Next Article"):
-                if article_index < total_articles:
+                    st.rerun()
+        else:
+            col_prev.empty()
+
+        # Display the article progress in the center column
+        with col_center:
+            st.markdown(
+                f"<div style='text-align: center;'>Article {article_index} of {total_articles}</div>",
+                unsafe_allow_html=True,
+            )
+
+        # If it's the last article, change the button to "Take Quiz"
+        with col_next:
+            if article_index < total_articles:
+                if st.button("Next Article"):
                     set_page(
                         "article",
                         module_number=module_number,
                         article_index=article_index + 1,
                     )
-                else:
+                    st.rerun()
+            else:
+                if st.button("Take Quiz"):
                     set_page("quiz", module_number=module_number)
-                st.rerun()
-
+                    st.rerun()
     elif current_page == "quiz":
         if module_number is None:
             st.error("No module specified for the quiz.")

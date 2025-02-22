@@ -1,83 +1,211 @@
 import streamlit as st
 import os
+import json
+from pathlib import Path
+from module_generator import ModuleGenerator
 
 
-def generate_streamlit_code(topic):
-    """
-    Simulate an LLM generating Streamlit UI code with navigation.
-    This code creates a sidebar for navigation between different pages.
-    """
-    code = f"""
-import streamlit as st
+# Helper functions for query param routing
+def set_page(page, module_number=None, article_index=None):
+    params = {"page": page}
+    if module_number is not None:
+        params["module"] = module_number
+    if article_index is not None:
+        params["article_index"] = article_index
+    st.experimental_set_query_params(**params)
 
-def show_home(topic):
-    st.title(f"Learning Materials for {{topic}}")
-    st.write("Welcome! Use the navigation on the left to explore the learning materials.")
 
-def show_syllabus(topic):
-    st.title(f"Syllabus for {{topic}}")
-    st.write("1. Introduction to {{topic}}")
-    st.write("2. Key Concepts in {{topic}}")
-    st.write("3. Advanced Topics in {{topic}}")
+def get_current_page():
+    params = st.experimental_get_query_params()
+    page = params.get("page", ["home"])[0]
+    module_number = int(params.get("module", [0])[0]) if "module" in params else None
+    article_index = (
+        int(params.get("article_index", [1])[0]) if "article_index" in params else 1
+    )
+    return page, module_number, article_index
 
-def show_articles(topic):
-    st.title(f"Learning Articles for {{topic}}")
-    st.write("- https://example.com/{{topic}}-basics")
-    st.write("- https://example.com/{{topic}}-advanced")
-    st.write("- https://example.com/{{topic}}-case-studies")
 
-def show_quiz(topic):
-    st.title(f"Quiz on {{topic}}")
-    st.write("1. What is {{topic}}?")
-    st.write("2. Name one application of {{topic}}.")
-    st.write("3. Describe a challenge related to {{topic}}.")
+def render_navbar():
+    """Render a top navigation bar with a home icon that links back to the home page."""
+    st.markdown(
+        """
+         <style>
+         .navbar {
+             background-color: #0e1117;  /* Dark background to match the rest of the page */
+             padding: 10px;
+             display: flex;
+             align-items: center;
+         }
+         .navbar a {
+             text-decoration: none;
+             color: #FFFFFF; /* White text for visibility */
+             font-size: 24px;
+             font-weight: bold;
+             margin-right: 20px;
+         }
+         </style>
+         <div class="navbar">
+             <a href="?page=home" target="_self">🏠</a>
+         </div>
+         """,
+        unsafe_allow_html=True,
+    )
+
+
+class ContentApp:
+    def __init__(self):
+        self.modules_dir = "modules"
+        if not os.path.exists(self.modules_dir):
+            os.makedirs(self.modules_dir)
+
+    def get_all_modules(self):
+        """Return a sorted list of tuples (module_number, module_data) for all modules."""
+        modules = []
+        for d in os.listdir(self.modules_dir):
+            if d.startswith("module_") and os.path.isdir(
+                os.path.join(self.modules_dir, d)
+            ):
+                try:
+                    module_number = int(d.split("_")[1])
+                    metadata_path = os.path.join(self.modules_dir, d, "module.py")
+                    if os.path.exists(metadata_path):
+                        with open(metadata_path, "r") as f:
+                            module_data = json.loads(f.read())
+                        modules.append((module_number, module_data))
+                except Exception as e:
+                    st.error(f"Error reading {d}: {e}")
+        modules.sort(key=lambda x: x[0])
+        return modules
+
+    def generate_new_module(self, topic):
+        """Generate a new module by incrementing from the last module number."""
+        modules = self.get_all_modules()
+        new_module_number = modules[-1][0] + 1 if modules else 1
+        generator = ModuleGenerator(topic, new_module_number)
+        generator.create_module_structure()
+        generator.generate_content()
+
 
 def main():
-    topic = "{topic}"
-    st.sidebar.title("Navigation")
-    selection = st.sidebar.radio("Go to", ["Home", "Syllabus", "Articles", "Quiz"])
-    
-    if selection == "Home":
-        show_home(topic)
-    elif selection == "Syllabus":
-        show_syllabus(topic)
-    elif selection == "Articles":
-        show_articles(topic)
-    elif selection == "Quiz":
-        show_quiz(topic)
+    st.set_page_config(page_title="Educational Content Generator")
+    app = ContentApp()
+    current_page, module_number, article_index = get_current_page()
 
-if __name__ == "__main__":
-    main()
-"""
-    return code
+    # Render navbar on every page except home
+    if current_page != "home":
+        render_navbar()
 
+    if current_page == "home":
+        st.title("Educational Content Generator")
+        st.write("Create a new module or select one from the list below.")
 
-def update_ui_file(new_code, filename="generated_ui.py"):
-    # Backup the original file if needed
-    if os.path.exists(filename):
-        os.rename(filename, filename + ".bak")
+        # Input for a new module
+        topic = st.text_input("Enter a topic for a new module:")
+        if st.button("Generate New Module"):
+            if topic.strip():
+                app.generate_new_module(topic.strip())
+                st.success(f"Module on '{topic}' created!")
+                st.rerun()
+            else:
+                st.error("Please enter a valid topic.")
 
-    with open(filename, "w") as f:
-        f.write(new_code)
-    st.success(f"Updated {filename} with new UI code!")
-
-
-def main():
-    st.title("Dynamic UI Code Generator")
-    topic = st.text_input("Enter a topic:", value="Example Topic")
-
-    if st.button("Generate New UI Code with Navigation"):
-        if topic.strip():
-            # Generate new code based on the topic
-            new_code = generate_streamlit_code(topic)
-            update_ui_file(new_code)
-
-            # Inform the user they might need to refresh or restart the app.
-            st.info(
-                "The UI code has been updated in 'generated_ui.py'. Please refresh your browser or restart the app to see changes."
-            )
+        st.write("## Available Modules")
+        modules = app.get_all_modules()
+        if modules:
+            for mod_num, mod_data in modules:
+                with st.container():
+                    st.subheader(mod_data.get("module_name", f"Module {mod_num}"))
+                    st.write("Learning Objectives:")
+                    for obj in mod_data.get("learning_objectives", []):
+                        st.write(f"- {obj}")
+                    if st.button("View Module", key=f"view_{mod_num}"):
+                        set_page("module", module_number=mod_num)
+                        st.rerun()
         else:
-            st.warning("Please enter a valid topic.")
+            st.info("No modules available yet. Create one above!")
+
+    elif current_page == "module":
+        if module_number is None:
+            st.error("No module specified.")
+            return
+        module_path = os.path.join("modules", f"module_{module_number}")
+        metadata_file = os.path.join(module_path, "module.py")
+        if not os.path.exists(metadata_file):
+            st.error("Module not found!")
+            return
+        try:
+            with open(metadata_file, "r") as f:
+                module_data = json.loads(f.read())
+            st.title(module_data.get("module_name", f"Module {module_number}"))
+            st.write("Learning Objectives:")
+            for objective in module_data.get("learning_objectives", []):
+                st.write(f"- {objective}")
+        except Exception as e:
+            st.error(f"Error loading module: {e}")
+            return
+
+        st.write("## Navigation")
+        if st.button("View Articles"):
+            set_page("article", module_number=module_number, article_index=1)
+            st.rerun()
+
+    elif current_page == "article":
+        if module_number is None:
+            st.error("No module specified for the article.")
+            return
+        module_path = os.path.join("modules", f"module_{module_number}")
+        article_file = os.path.join(module_path, f"article_{article_index}.py")
+        if not os.path.exists(article_file):
+            st.error("Article not found!")
+            return
+        with open(article_file, "r") as f:
+            article_content = f.read()
+            exec(article_content, globals())
+
+        total_articles = len(
+            [f for f in os.listdir(module_path) if f.startswith("article_")]
+        )
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Previous Article"):
+                if article_index == 1:
+                    set_page("module", module_number=module_number)
+                else:
+                    set_page(
+                        "article",
+                        module_number=module_number,
+                        article_index=article_index - 1,
+                    )
+                st.rerun()
+        with col2:
+            if st.button("Next Article"):
+                if article_index < total_articles:
+                    set_page(
+                        "article",
+                        module_number=module_number,
+                        article_index=article_index + 1,
+                    )
+                else:
+                    set_page("quiz", module_number=module_number)
+                st.rerun()
+
+    elif current_page == "quiz":
+        if module_number is None:
+            st.error("No module specified for the quiz.")
+            return
+        module_path = os.path.join("modules", f"module_{module_number}")
+        quiz_file = os.path.join(module_path, "quiz.py")
+        if not os.path.exists(quiz_file):
+            st.error("Quiz not found!")
+            return
+        with open(quiz_file, "r") as f:
+            quiz_content = f.read()
+            exec(quiz_content, globals())
+        if st.button("Back to Module Overview"):
+            set_page("module", module_number=module_number)
+            st.rerun()
+    else:
+        st.error("Page not found!")
 
 
 if __name__ == "__main__":

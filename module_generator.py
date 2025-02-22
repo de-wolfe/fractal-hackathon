@@ -213,11 +213,11 @@ class ModuleGenerator:
 
         # Generate and enhance quiz content
         quiz_content = self.generate_enhanced_assessment(
-            subject, learning_style, module_data.get("overview", "")
+            subject, learning_style, article_content
         )
         with open(f"{self.module_path}/quiz.py", "w") as f:
             f.write("import modules.utils as utils\n")
-            f.write("params = st.experimental_get_query_params()\n")
+            f.write("params = st.params = st.query_params\n")
             f.write("module_number = int(params.get(\"module\", [0])[0]) if \"module\" in params else None\n")
             f.write(quiz_content)
 

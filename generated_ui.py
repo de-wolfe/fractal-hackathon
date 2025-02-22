@@ -36,7 +36,8 @@ def show_back():
     st.markdown("### Return to Generator")
     st.write("Click the button below to go back to the generator.")
     if st.button("Go Back"):
-        st.experimental_set_query_params(page="generator")
+        st.set_query_params(page="generator")
+
 
 def main():
     topic = "Example Topic"

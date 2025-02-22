@@ -17,13 +17,14 @@ def set_page(page, module_number=None, article_index=None):
         params["module"] = module_number
     if article_index is not None:
         params["article_index"] = article_index
-    st.experimental_set_query_params(**params)
+    st.query_params.update(params)
     st.rerun()  # Using st.rerun() instead of experimental_rerun()
 
 
 def get_current_page():
-    params = st.experimental_get_query_params()
-    page = params.get("page", ["home"])[0]
+    params = st.query_params  # Use the new format
+    
+    page = params.get("page", "home")
     module_number = int(params.get("module", [0])[0]) if "module" in params else None
     article_index = (
         int(params.get("article_index", [1])[0]) if "article_index" in params else 1

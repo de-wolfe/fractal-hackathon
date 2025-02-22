@@ -9,7 +9,7 @@ def set_page(page, module_number=None, article_index=None):
         params["module"] = module_number
     if article_index is not None:
         params["article_index"] = article_index
-    st.experimental_set_query_params(**params)
+    st.query_params.update(params)
     st.rerun()
 
 

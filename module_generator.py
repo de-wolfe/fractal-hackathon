@@ -17,12 +17,11 @@ claude_client = anthropic.Anthropic(api_key=claude_key)
 def clean_streamlit_code(code):
     """Remove setup config and unnecessary imports from Streamlit code."""
     # something broken here
-    return code
     lines = code.splitlines()
     cleaned_lines = []
     for line in lines:
         # Skip markdown fences and st.set_page_config and extraneous imports
-        if line.strip().startswith("```") or "st.set_page_config" in line:
+        if line.strip().startswith("```"):
             continue
         cleaned_lines.append(line)
     return "\n".join(cleaned_lines)
@@ -168,7 +167,9 @@ class ModuleGenerator:
         with open(f"{self.module_path}/quiz.py", "w") as f:
             f.write("import modules.utils as utils\n")
             f.write("params = st.experimental_get_query_params()\n")
-            f.write("module_number = int(params.get(\"module\", [0])[0]) if \"module\" in params else None\n")
+            f.write(
+                'module_number = int(params.get("module", [0])[0]) if "module" in params else None\n'
+            )
             f.write(quiz_content)
 
     def generate_module_metadata(self, subject, learning_style):

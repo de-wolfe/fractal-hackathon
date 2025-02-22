@@ -25,8 +25,7 @@ def clean_streamlit_code(code):
         cleaned_lines.append(line)
     return "\n".join(cleaned_lines)
 
-
-def enhance_with_claude(content, purpose):
+def enhance_teaching_with_claude(content, purpose):
     """Use Claude to enhance and fix Streamlit content."""
     prompt = f"""As an expert in creating engaging Streamlit applications, please enhance this code:
 1. Fix any potential issues or bugs.
@@ -35,6 +34,62 @@ def enhance_with_claude(content, purpose):
 4. Keep the core teaching content but make it more engaging.
 5. Ensure that all necessary imports are included at the top of the code. In particular, if the code uses functions or modules like colorsys or numpy (as np), include "import colorsys" or "import numpy as np" respectively. Only use packages from our approved package list.
 6. Maintain any essential existing imports.
+
+Here's the code to enhance:
+{content}
+
+Purpose of this content: {purpose}
+
+Return the enhanced code between <code> </code> tags. Include ALL necessary imports at the top of the code."""
+
+    response = claude_client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=2000,
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    # Extract the text content from Claude's response
+    if hasattr(response.content, "text"):
+        response_text = response.content.text
+    elif isinstance(response.content, list) and len(response.content) > 0:
+        response_text = response.content[0].text
+    else:
+        response_text = str(response.content)
+
+    if not response_text:
+        return content  # Return original content if enhancement fails
+
+    # Extract code from between <code> tags
+    import re
+
+    code_match = re.search(r"<code>(.*?)</code>", response_text, re.DOTALL)
+
+    if code_match:
+        enhanced_content = code_match.group(1).strip()
+    else:
+        # If no code tags found, try to use the full response
+        enhanced_content = response_text.strip()
+
+    # Only clean the code if it's not just imports
+    if not all(
+        line.strip().startswith("import") or line.strip().startswith("from")
+        for line in enhanced_content.splitlines()
+    ):
+        enhanced_content = clean_streamlit_code(enhanced_content)
+
+    return enhanced_content
+
+def enhance_assessment_with_claude(content, purpose, previous_module):
+    """Use Claude to enhance and fix Streamlit content."""
+    prompt = f"""As an expert in creating engaging Streamlit educational assessment applications, please enhance this code:
+1. Fix any potential issues or bugs.
+2. Make the display more visually appealing and interactive.
+3. Remove any st.set_page_config calls.
+4. Keep the core assessment the same but make it more aesthetic.
+5. Ensure that all necessary imports are included at the top of the code. In particular, if the code uses functions or modules like colorsys or numpy (as np), include "import colorsys" or "import numpy as np" respectively. Only use packages from our approved package list.
+6. Maintain any essential existing imports.
+7. Once a user gets all the answers correct on the assessment, be certain to call a function called exactly this:'utils.quiz_passed(module_number). Never include 'import utils' in the code.
+8. Make sure the assessment only tests material that could be learned from this module: {previous_module}
 
 Here's the code to enhance:
 {content}
@@ -229,7 +284,7 @@ class ModuleGenerator:
         )
         # Then enhance it with Claude
         purpose = f"Educational article about {subject} titled '{article_title}' for {learning_style} learning style"
-        enhanced_content = enhance_with_claude(initial_content, purpose)
+        enhanced_content = enhance_teaching_with_claude(initial_content, purpose)
         return enhanced_content
 
     def generate_teaching_article(self, subject, learning_style, article_title):
@@ -259,12 +314,12 @@ class ModuleGenerator:
         )
         # Enhance with Claude
         purpose = f"Assessment quiz for {subject} module, tailored to {learning_style} learning style"
-        enhanced_content = enhance_with_claude(initial_content, purpose)
+        enhanced_content = enhance_assessment_with_claude(initial_content, purpose, previous_module)
         return enhanced_content
 
     def generate_assessment(self, subject, learning_style, previous_module):
         """Generate a short assessment based on the module overview using AI chat completions."""
-        completion = client.chat.completions.create(
+        completion = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful tutor who is going to assess if a student understood certain subject material. You will do this by returning Streamlit code that will fit in individual Python files/pages. Focus on returning creative UI components, like tables, interactive graphs, games, or anything else you can think of that will surprise the student that will help the student learn. Only return Streamlit code, nothing else that would not work directly as Streamlit code, no not return any backticks."},

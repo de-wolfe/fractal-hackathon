@@ -1,0 +1,19 @@
+{
+  "module_number": 1,
+  "module_name": "Module 1: Introduction to Chemistry",
+  "overview": "Module Overview: Visualizing Chemistry\n\nThis module brings chemistry to life through vibrant visual learning experiences. You'll explore molecular structures using 3D models, decode colorful chemical reactions, and understand complex concepts through detailed diagrams and animations.\n\nKey Visual Components:\n\u2022 Color-coded periodic table maps\n\u2022 Interactive molecular modeling\n\u2022 Step-by-step reaction diagrams\n\u2022 Chemical bonding animations\n\u2022 Visual laboratory experiments\n\u2022 Color-changing indicator demonstrations\n\u2022 Atomic structure illustrations\n\u2022 Energy level sketches\n\nRather than memorizing formulas, you'll see how atoms combine, watch electrons move between energy levels, and visualize the dynamic world of chemical interactions. Each lesson incorporates visual aids, from simple sketches to sophisticated computer models, helping you build a clear mental picture of chemical processes.\n\nPerfect for learners who prefer to \"see it to understand it,\" this module transforms abstract chemical concepts into memorable visual experiences.",
+  "learning_objectives": [
+    "Understand the fundamentals of Chemistry",
+    "Explore advanced concepts in Chemistry",
+    "Apply practical examples related to Chemistry"
+  ],
+  "articles": {
+    "1": "\"Color-Changing Reactions: A Visual Guide to Chemical Transformations\"",
+    "2": "\"Molecular Models in 3D: Understanding Chemical Structures Through Visual Patterns\"",
+    "3": "\"From Crystal Formation to Flame Tests: The Rainbow World of Chemical Reactions\""
+  },
+  "progress": {
+    "current_article": 2,
+    "quiz_passed": false
+  }
+}

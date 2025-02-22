@@ -108,7 +108,7 @@ class ContentApp:
         """Generate a new module by incrementing from the last module number."""
         modules = self.get_all_modules()
         new_module_number = modules[-1][0] + 1 if modules else 1
-        generator = ModuleGenerator(topic, new_module_number)
+        generator = ModuleGenerator(topic, new_module_number, "claude")
         generator.create_module_structure()
         generator.generate_content(topic, learning_style)
 

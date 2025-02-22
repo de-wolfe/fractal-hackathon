@@ -58,7 +58,7 @@ def render_navbar():
         """
          <style>
          .navbar {
-             background-color: #0e1117;
+             background-color: #FFFFFF;
              padding: 10px;
              display: flex;
              align-items: center;

@@ -34,6 +34,7 @@ def enhance_teaching_with_claude(content, purpose):
 4. Keep the core teaching content but make it more engaging.
 5. Ensure that all necessary imports are included at the top of the code. In particular, if the code uses functions or modules like colorsys or numpy (as np), include "import colorsys" or "import numpy as np" respectively. Only use packages from our approved package list.
 6. Maintain any essential existing imports.
+7. Make sure the content is still teaching them about the subject
 
 Here's the code to enhance:
 {content}

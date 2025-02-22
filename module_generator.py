@@ -57,6 +57,9 @@ class ModuleGenerator:
             subject, learning_style, module_data.get("overview", "")
         )
         with open(f"{self.module_path}/quiz.py", "w") as f:
+            f.write("import modules.utils as utils\n")
+            f.write("params = st.experimental_get_query_params()\n")
+            f.write("module_number = int(params.get(\"module\", [0])[0]) if \"module\" in params else None\n")
             f.write(quiz_content)
 
     def generate_module_metadata(self, subject, learning_style):
@@ -81,122 +84,36 @@ class ModuleGenerator:
     def generate_overview(self, subject, learning_style):
         """Generate a brief module overview using AI."""
         completion = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a helpful tutor who creates engaging module overviews for a subject. "
-                        "Return a short overview in plain text."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"Generate a brief overview for a module teaching {subject} in a way that fits this learning style: {learning_style}."
-                    ),
-                },
-            ],
-        )
-        overview_text = completion.choices[0].message.content.strip()
-        return overview_text
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful tutor who is going to teach someone a subject they request in an engaging, concise way. You will do this by returning Streamlit code that will fit in individual Python files/pages. Start by teaching the student about the topic, and make sure to include creative interactive components to help them learn. Only return Streamlit code, nothing else that would not work directly as Streamlit code, no not return any backticks. "},
+            {"role": "system", "content": f"Here is some information on the learning style of this particular student, or things that make it easier for them to learn:{learning_style}. When making Streamlit components, prioritize making content in this style."},
 
-    def generate_article_titles(self, subject, learning_style):
-        """Generate a dictionary of article numbers to article titles using AI."""
-        num_articles = 3  # Adjust the number of articles as needed.
-        completion = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a creative tutor generating article titles for an educational module. "
-                        "Return only a numbered list of titles, one per line."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"Generate {num_articles} article titles for a module on {subject} that fits this learning style: {learning_style}."
-                    ),
-                },
-            ],
-        )
-        titles_text = completion.choices[0].message.content.strip()
-        article_titles = {}
-        for line in titles_text.splitlines():
-            if "." in line:
-                parts = line.split(".", 1)
-                try:
-                    num = int(parts[0].strip())
-                    title = parts[1].strip()
-                    article_titles[str(num)] = title
-                except Exception:
-                    continue
-        return article_titles
-
-    def generate_teaching_article(self, subject, learning_style, article_title):
-        """Generate a creative, engaging article for a given title using AI chat completions."""
-        completion = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a creative tutor who designs innovative and visually engaging educational content "
-                        "using Streamlit code. Return only the Streamlit code that can be executed directly, with no extra text "
-                        "or markdown code fences."
-                    ),
-                },
-                {
-                    "role": "system",
-                    "content": (
-                        f"The student's learning style is as follows: {learning_style}. When generating the content, emphasize "
-                        "interactive components, creative visualizations, and modern aesthetics that make learning fun and engaging."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"Generate a short, creative article with the title '{article_title}' about {subject}. "
-                        "The article should be 5-6 paragraphs long, include interactive or visually appealing elements, "
-                        "and be presented using Streamlit code only. Make sure you think outside the box for the display elements,"
-                        "Be very careful that the code doesn't break though, this will crash the app. Go safe!"
-                    ),
-                },
-            ],
-        )
-        teaching_content = completion.choices[0].message.content.strip()
-        # Remove any markdown code fences that might have been included
-        teaching_content = clean_streamlit_code(teaching_content)
+            {
+                "role": "user",
+                "content": f"Start teaching about {subject}. The amount of information contained should be no more than a paragraph or 2. Return Streamlit code."
+            }
+        ]
+    )
+        teaching_content = f"{completion.choices[0].message.content}\n"
         print(teaching_content)
         return teaching_content
 
     def generate_assessment(self, subject, learning_style, previous_module):
         """Generate a short assessment based on the module overview using AI chat completions."""
         completion = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a helpful tutor who is going to assess if a student understood certain subject material. "
-                        "Return only Streamlit code that can render a short assessment (1-2 questions)."
-                    ),
-                },
-                {
-                    "role": "system",
-                    "content": f"Here is the module overview as plain text: {previous_module}",
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"Generate a concise assessment to test a student's understanding of {subject} based on the above overview. "
-                        "Return only Streamlit code."
-                    ),
-                },
-            ],
-        )
-        assessment_content = completion.choices[0].message.content.strip()
-        assessment_content = clean_streamlit_code(assessment_content)
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful tutor who is going to assess if a student understood certain subject material. You will do this by returning Streamlit code that will fit in individual Python files/pages. Focus on returning creative UI components, like tables, interactive graphs, games, or anything else you can think of that will surprise the student that will help the student learn. Only return Streamlit code, nothing else that would not work directly as Streamlit code, no not return any backticks."},
+            {"role": "system", "content": f"Here is the module the student tried to learn from as Streamlit code:{previous_module}"},
+            {"role": "system", "content": f"Once a user gets all the answers correct on the quiz, be certain to call a function called 'utils.quiz_passed(module_number)"},
+
+            {
+                "role": "user",
+                "content": f"Generate some short, concise method of assessing the student to test their understanding of {subject} based on the module they tried to learn the material from. Only inlcude information they could have learned from the module, and only return Streamlit code, no not return any backticks."
+            }
+        ]
+    )
+        assessment_content = f"{completion.choices[0].message.content}\n"
+        print(assessment_content)
         return assessment_content

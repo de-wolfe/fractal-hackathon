@@ -24,6 +24,7 @@ def ask_openai_assessing(subject, crazy_level, previous_module):
         messages=[
             {"role": "system", "content": "You are a helpful tutor who is going to assess if a student understood certain subject material. You will do this by returning Streamlit code that will fit in individual Python files/pages. Only return Streamlit code, nothing else that would not work directly as Streamlit code, no not return any backticks."},
             {"role": "system", "content": f"Here is the module the student tried to learn from as Streamlit code:{previous_module}"},
+            {"role": "system", "content": f"Once a user gets all the answers correct on the quiz, be certain to call a function called 'quiz_passed()"},
             {
                 "role": "user",
                 "content": f"Generate some short, concise method of assessing the student like a quiz, text input, or something else, to test their understanding of {subject} based on the module they tried to learn the material from. Make this way of testing them be about 1 or 2 questions long. How crazy the component or method of teaching will be delineated by a Crazy Level. This user wants a crazy level of {crazy_level}. Only inlcude information they could have learned from the module, and only return Streamlit code, no not return any backticks."

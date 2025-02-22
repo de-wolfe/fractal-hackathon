@@ -1,4 +1,7 @@
 import streamlit as st
+import writer
+import test_gpt_call
+
 import os
 import json
 from pathlib import Path
@@ -6,6 +9,8 @@ from module_generator import ModuleGenerator
 from module_overview import render_module_overview
 from quiz_module import render_quiz_module
 from article_module import render_article_module
+
+
 
 
 # Helper functions for query param routing
@@ -101,14 +106,13 @@ class ContentApp:
         modules.sort(key=lambda x: x[0])
         return modules
 
-    def generate_new_module(self, topic):
+    def generate_new_module(self, topic, learning_style):
         """Generate a new module by incrementing from the last module number."""
         modules = self.get_all_modules()
         new_module_number = modules[-1][0] + 1 if modules else 1
         generator = ModuleGenerator(topic, new_module_number)
         generator.create_module_structure()
-        generator.generate_content()
-
+        generator.generate_content(topic, learning_style)
 
 def main():
     st.set_page_config(page_title="Educational Content Generator")
@@ -122,12 +126,14 @@ def main():
     if current_page == "home":
         st.title("Educational Content Generator")
         st.write("Create a new module or select one from the list below.")
-
+        # Streamlit UI setup
+        topic = st.text_input("What do you want to learn about?")
+        learning_style = st.text_input("How do you best learn?")
+        crazy_level = st.slider("Crazy Level")
         # Input for a new module
-        topic = st.text_input("Enter a topic for a new module:")
         if st.button("Generate New Module"):
             if topic.strip():
-                app.generate_new_module(topic.strip())
+                app.generate_new_module(topic.strip(), learning_style)
                 st.success(f"Module on '{topic}' created!")
                 st.rerun()
             else:
@@ -166,7 +172,6 @@ def main():
 
     else:
         st.error("Page not found!")
-
 
 if __name__ == "__main__":
     main()

@@ -21,7 +21,7 @@ class ModuleGenerator:
         os.makedirs(self.module_path, exist_ok=True)
 
         # Create empty files for metadata, article, and quiz
-        Path(f"{self.module_path}/module.py").touch()
+        Path(f"{self.module_path}/module.json").touch()
         Path(f"{self.module_path}/article_1.py").touch()
         Path(f"{self.module_path}/quiz.py").touch()
 
@@ -29,7 +29,7 @@ class ModuleGenerator:
         """Generate content for all module files using OpenAI."""
         # Generate and save module metadata (including progress tracking)
         module_data = self.generate_module_metadata()
-        with open(f"{self.module_path}/module.py", "w") as f:
+        with open(f"{self.module_path}/module.json", "w") as f:
             f.write(json.dumps(module_data, indent=2))
 
         # Generate and save article content

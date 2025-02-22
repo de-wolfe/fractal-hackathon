@@ -4,10 +4,24 @@ from pathlib import Path
 from openai import OpenAI
 import streamlit as st
 
-api_key = st.secrets["OPENAI_KEY"]
+api_key = st.secrets["OPENAI_API_KEY"]
 
 # Instantiate the OpenAI client
 client = OpenAI(api_key=api_key)
+
+
+def clean_streamlit_code(code):
+    """
+    Remove markdown code fences (e.g. lines starting with triple backticks)
+    from the provided code so that only pure Streamlit code remains.
+    """
+    lines = code.splitlines()
+    cleaned_lines = []
+    for line in lines:
+        if line.strip().startswith("```"):
+            continue
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines)
 
 
 class ModuleGenerator:
@@ -19,48 +33,56 @@ class ModuleGenerator:
     def create_module_structure(self):
         """Create the module directory and empty files."""
         os.makedirs(self.module_path, exist_ok=True)
-
-        # Create empty files for metadata, article, and quiz
+        # Create empty metadata and quiz files; article files will be created after generating titles.
         Path(f"{self.module_path}/module.json").touch()
-        Path(f"{self.module_path}/article_1.py").touch()
         Path(f"{self.module_path}/quiz.py").touch()
 
     def generate_content(self, subject, learning_style):
         """Generate content for all module files using OpenAI."""
-        # Generate and save module metadata (including progress tracking)
-        module_data = self.generate_module_metadata()
+        # Generate module metadata (overview and article titles)
+        module_data = self.generate_module_metadata(subject, learning_style)
         with open(f"{self.module_path}/module.json", "w") as f:
-            f.write(json.dumps(module_data, indent=2))
+            json.dump(module_data, f, indent=2)
 
-        # Generate and save article content
-        article_content = self.generate_teaching(subject, learning_style)
-        with open(f"{self.module_path}/article_1.py", "w") as f:
-            f.write(article_content)
+        # For each article title, generate the article content and save it.
+        for article_num, title in module_data["articles"].items():
+            article_content = self.generate_teaching_article(
+                subject, learning_style, title
+            )
+            with open(f"{self.module_path}/article_{article_num}.py", "w") as f:
+                f.write(article_content)
 
         # Generate and save quiz content
-        quiz_content = self.generate_assessment(subject, learning_style, article_content)
+        quiz_content = self.generate_assessment(
+            subject, learning_style, module_data.get("overview", "")
+        )
         with open(f"{self.module_path}/quiz.py", "w") as f:
             f.write("import modules.utils as utils\n")
             f.write("params = st.experimental_get_query_params()\n")
             f.write("module_number = int(params.get(\"module\", [0])[0]) if \"module\" in params else None\n")
             f.write(quiz_content)
 
-    def generate_module_metadata(self):
-        """Generate module metadata including progress tracking."""
+    def generate_module_metadata(self, subject, learning_style):
+        """Generate module metadata including overview, article titles, and progress tracking."""
+        overview = self.generate_overview(subject, learning_style)
+        article_titles = self.generate_article_titles(subject, learning_style)
         return {
             "module_number": self.module_number,
             "module_name": f"Module {self.module_number}: Introduction to {self.topic}",
+            "overview": overview,
             "learning_objectives": [
                 f"Understand the fundamentals of {self.topic}",
                 f"Explore advanced concepts in {self.topic}",
                 f"Apply practical examples related to {self.topic}",
             ],
+            # Dictionary mapping article numbers to titles
+            "articles": article_titles,
             # Progress tracking for articles and quiz
             "progress": {"current_article": 1, "quiz_passed": False},
         }
 
-    def generate_teaching(self, subject, learning_style):
-        """Generate an article about the topic using OpenAI chat completions."""
+    def generate_overview(self, subject, learning_style):
+        """Generate a brief module overview using AI."""
         completion = client.chat.completions.create(
         model="gpt-4o",
         messages=[
@@ -78,7 +100,7 @@ class ModuleGenerator:
         return teaching_content
 
     def generate_assessment(self, subject, learning_style, previous_module):
-        """Generate a multiple-choice quiz question about the topic using OpenAI chat completions."""
+        """Generate a short assessment based on the module overview using AI chat completions."""
         completion = client.chat.completions.create(
         model="gpt-4o",
         messages=[

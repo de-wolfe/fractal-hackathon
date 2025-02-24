@@ -11,4 +11,4 @@ streamlit==1.42.2
 pillow==11.1.0
 folium
 streamlit_folium
-strealit_extras
+streamlit_extras

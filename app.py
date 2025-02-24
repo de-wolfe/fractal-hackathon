@@ -132,9 +132,9 @@ def main():
         # Input for a new module
         if st.button("Generate New Module"):
             if topic.strip():
-                app.generate_new_module(topic.strip(), learning_style)
+                with st.spinner(text="In progress, this may take a few moments..."):
+                    app.generate_new_module(topic.strip(), learning_style)
                 st.success(f"Module on '{topic}' created!")
-                st.rerun()
             else:
                 st.error("Please enter a valid topic.")
 
